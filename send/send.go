@@ -9,14 +9,17 @@ import (
 )
 
 func main() {
+	// Create Connection to server
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
+	// Create a channel
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
+	// Declare a Queue
 	q, err := ch.QueueDeclare(
 		"hello", // name
 		false,   // durable
@@ -27,9 +30,11 @@ func main() {
 	)
 	failOnError(err, "Failed to declare a queue")
 
+	// Create a contenxt
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	// Send to Queue
 	body := "Hello World!"
 	err = ch.PublishWithContext(ctx,
 		"",     // exchange
