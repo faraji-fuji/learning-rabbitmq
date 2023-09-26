@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/faraji-fuji/learning-rabbitmq/pubsub"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -17,28 +18,18 @@ func main() {
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
-	ch, err := conn.Channel()
+	ch, err := pubsub.InitPubSub(conn, "test-exchange", "test-queue")
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	q, err := ch.QueueDeclare(
-		"dev-buy-n-order", // name
-		false,         // durable
-		false,         // delete when unused
-		false,         // exclusive
-		false,         // no-wait
-		nil,           // arguments
-	)
-	failOnError(err, "Failed to declare a queue")
-
 	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+		"test-queue", // queue
+		"",           // consumer
+		true,         // auto-ack
+		false,        // exclusive
+		false,        // no-local
+		false,        // no-wait
+		nil,          // args
 	)
 	failOnError(err, "Failed to register a consumer")
 

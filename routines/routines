@@ -1,0 +1,13 @@
+package main
+
+func main() {
+
+}
+
+
+func sayHi() chan string{
+	go func() {
+		fmt.Println("HI")
+	}
+
+}
